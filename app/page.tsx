@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,32 +17,80 @@ function generateReferralCode(email: string): string {
 }
 
 export default function WaitlistPage() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [referredBy, setReferredBy] = useState("");
-  const searchParams = useSearchParams();
+  // Extracted inner client logic to a component inside Suspense
+  function WaitlistForm() {
+    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
+    const [referredBy, setReferredBy] = useState("");
+    const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const refCode = searchParams.get("ref");
-    if (refCode) {
-      setReferredBy(refCode);
-      // Store in localStorage so it persists
-      localStorage.setItem("referredBy", refCode);
-    } else {
-      // Check if we have a stored referral code
-      const storedRef = localStorage.getItem("referredBy");
-      if (storedRef) {
-        setReferredBy(storedRef);
+    useEffect(() => {
+      const refCode = searchParams.get("ref");
+      if (refCode) {
+        setReferredBy(refCode);
+        localStorage.setItem("referredBy", refCode);
+      } else {
+        const storedRef = localStorage.getItem("referredBy");
+        if (storedRef) setReferredBy(storedRef);
       }
-    }
-  }, [searchParams]);
+    }, [searchParams]);
 
-  const handleBeforeSubmit = () => {
-    const referralCode = generateReferralCode(email);
-    sessionStorage.setItem("waitlistEmail", email);
-    sessionStorage.setItem("waitlistName", name);
-    sessionStorage.setItem("referralCode", referralCode);
-  };
+    const handleBeforeSubmit = () => {
+      const referralCode = generateReferralCode(email);
+      sessionStorage.setItem("waitlistEmail", email);
+      sessionStorage.setItem("waitlistName", name);
+      sessionStorage.setItem("referralCode", referralCode);
+    };
+
+    return (
+      <form
+        action={`https://app.proforms.top/f/${process.env.NEXT_PUBLIC_PROFORMS_API_KEY}`}
+        method='POST'
+        onSubmit={handleBeforeSubmit}
+        className='mx-auto mb-4 max-w-md'
+      >
+        <div className='flex flex-col gap-3'>
+          <Input
+            type='text'
+            id='name'
+            name='name'
+            placeholder='Enter your name'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className='bg-background/80 backdrop-blur-sm focus:border-[#2db56b] border-border focus:ring-[#2db56b] h-12 text-base'
+          />
+          <Input
+            type='email'
+            id='email'
+            name='email'
+            placeholder='Enter your email'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className='bg-background/80 backdrop-blur-sm focus:border-[#2db56b] border-border focus:ring-[#2db56b] h-12 text-base'
+          />
+          <input
+            type='hidden'
+            name='referral_code'
+            value={generateReferralCode(email)}
+          />
+          <input type='hidden' name='referred_by' value={referredBy} />
+
+          <Button
+            type='submit'
+            className='bg-[#2db56b] hover:bg-[#25a05d] shadow-[#2db56b]/20 shadow-lg px-8 h-12 font-semibold text-white transition-all'
+          >
+            Join Waitlist
+          </Button>
+        </div>
+        <p className='mt-3 text-muted-foreground text-xs text-center'>
+          🚀 Sign up to explore Muba • Fast and secure access
+        </p>
+      </form>
+    );
+  }
+
   return (
     <BackgroundBeamsWithCollision>
       <div className='z-20 relative mx-auto px-4 py-12 md:py-20 max-w-4xl'>
@@ -93,53 +141,9 @@ export default function WaitlistPage() {
         </div>
 
         {/* Waitlist Form */}
-        <form
-          action={`https://app.proforms.top/f/${process.env.NEXT_PUBLIC_PROFORMS_API_KEY}`}
-          method='POST'
-          onSubmit={handleBeforeSubmit}
-          className='mx-auto mb-4 max-w-md'
-        >
-          <div className='flex flex-col gap-3'>
-            <Input
-              type='text'
-              id='name'
-              name='name'
-              placeholder='Enter your name'
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className='bg-background/80 backdrop-blur-sm focus:border-[#2db56b] border-border focus:ring-[#2db56b] h-12 text-base'
-              title='Please enter your name'
-            />
-            <Input
-              type='email'
-              id='email'
-              name='email'
-              placeholder='Enter your email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className='bg-background/80 backdrop-blur-sm focus:border-[#2db56b] border-border focus:ring-[#2db56b] h-12 text-base'
-              title='Please use your email address'
-            />
-            <input
-              type='hidden'
-              name='referral_code'
-              value={generateReferralCode(email)}
-            />
-            <input type='hidden' name='referred_by' value={referredBy} />
-
-            <Button
-              type='submit'
-              className='bg-[#2db56b] hover:bg-[#25a05d] shadow-[#2db56b]/20 shadow-lg px-8 h-12 font-semibold text-white transition-all'
-            >
-              Join Waitlist
-            </Button>
-          </div>
-          <p className='mt-3 text-muted-foreground text-xs text-center'>
-            🚀 Sign up to explore Muba • Fast and secure access
-          </p>
-        </form>
+        <Suspense fallback={<div className='text-center'>Loading form...</div>}>
+          <WaitlistForm />
+        </Suspense>
 
         {/* Trust Badge */}
         <div className='mt-2 text-center'>
