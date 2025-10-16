@@ -125,14 +125,19 @@ export default function WaitlistPage() {
         {/* Social Proof */}
         <div className='flex justify-center items-center gap-2 mb-8'>
           <div className='flex -space-x-2'>
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className='flex justify-center items-center bg-gradient-to-br from-[#2db56b] to-[#25a05d] border-2 border-background rounded-full w-8 h-8 font-semibold text-white text-xs'
-              >
-                {String.fromCharCode(64 + i)}
-              </div>
-            ))}
+            {Array.from({ length: 4 }).map((_, i) => {
+              const randomLetter = String.fromCharCode(
+                65 + Math.floor(Math.random() * 26)
+              ); // A–Z
+              return (
+                <div
+                  key={i}
+                  className='flex justify-center items-center bg-gradient-to-br from-[#2db56b] to-[#25a05d] border-2 border-background rounded-full w-8 h-8 font-semibold text-white text-xs'
+                >
+                  {randomLetter}
+                </div>
+              );
+            })}
           </div>
           <p className='text-muted-foreground text-sm'>
             <span className='font-semibold text-foreground'>28 students</span>{" "}
