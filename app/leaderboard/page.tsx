@@ -495,6 +495,14 @@ export default function LeaderboardPage() {
               </a>
             </Button>
           </div>
+          <div className='mt-8 text-muted-foreground text-sm text-center'>
+            <Link
+              href='/terms-and-conditions'
+              className='hover:text-[#2db56b] underline transition-colors'
+            >
+              View Terms & Conditions
+            </Link>
+          </div>
         </div>
       </div>
     </BackgroundBeamsWithCollision>
