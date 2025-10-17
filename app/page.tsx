@@ -7,7 +7,7 @@ import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-w
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CheckCircle2 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
 function generateReferralCode(email: string): string {
@@ -18,7 +18,6 @@ function generateReferralCode(email: string): string {
 }
 
 export default function WaitlistPage() {
-  // Extracted inner client logic to a component inside Suspense
   function WaitlistForm() {
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
@@ -26,7 +25,9 @@ export default function WaitlistPage() {
     const [hasReferralParam, setHasReferralParam] = useState(false);
     const [error, setError] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const searchParams = useSearchParams();
+    const router = useRouter();
 
     useEffect(() => {
       const refCode = searchParams.get("ref");
@@ -49,7 +50,6 @@ export default function WaitlistPage() {
       setHasReferralParam(false);
     };
 
-    // ✅ Prevent duplicate emails using the same API used for leaderboard
     const checkDuplicateEmail = async (email: string): Promise<boolean> => {
       try {
         const apiKey = process.env.NEXT_PUBLIC_PROFORMS_API_KEY;
@@ -85,34 +85,87 @@ export default function WaitlistPage() {
       }
     };
 
-    const handleBeforeSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setError("");
       setIsSubmitting(true);
 
-      const alreadyExists = await checkDuplicateEmail(email);
-      if (alreadyExists) {
-        setError("This email has already joined the waitlist.");
+      try {
+        // Check for duplicate email
+        const alreadyExists = await checkDuplicateEmail(email);
+        if (alreadyExists) {
+          setError("This email has already joined the waitlist.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        const referralCode = generateReferralCode(email);
+
+        // Store data in session storage
+        sessionStorage.setItem("waitlistEmail", email);
+        sessionStorage.setItem("waitlistName", name);
+        sessionStorage.setItem("referralCode", referralCode);
+
+        // Submit form data using fetch for better control
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("referral_code", referralCode);
+        formData.append("referred_by", referredBy);
+
+        const apiKey = process.env.NEXT_PUBLIC_PROFORMS_API_KEY;
+        const submitUrl = `https://app.proforms.top/f/${apiKey}`;
+
+        const submitResponse = await fetch(submitUrl, {
+          method: "POST",
+          body: formData,
+        });
+
+        // Check if submission was successful
+        if (submitResponse.ok || submitResponse.status === 302) {
+          // Success! Show success message or redirect
+          setIsSuccess(true);
+          setIsSubmitting(false);
+
+          // Optional: Redirect to a success page after a delay
+          setTimeout(() => {
+            router.push("/success"); // Adjust this path as needed
+          }, 1000);
+        } else {
+          throw new Error("Failed to submit form");
+        }
+      } catch (err) {
+        console.error("Submission error:", err);
+        setError("Something went wrong. Please try again.");
         setIsSubmitting(false);
-        return;
       }
-
-      const referralCode = generateReferralCode(email);
-      sessionStorage.setItem("waitlistEmail", email);
-      sessionStorage.setItem("waitlistName", name);
-      sessionStorage.setItem("referralCode", referralCode);
-
-      // Submit to ProForms
-      e.currentTarget.submit();
     };
 
+    // Show success message if submission was successful
+    if (isSuccess) {
+      return (
+        <div className='mx-auto max-w-md text-center'>
+          <div className='bg-[#2db56b]/10 mb-4 p-6 border border-[#2db56b] rounded-lg'>
+            <CheckCircle2 className='mx-auto mb-4 w-12 h-12 text-[#2db56b]' />
+            <h3 className='mb-2 font-bold text-foreground text-xl'>
+              You&apos;re on the list! 🎉
+            </h3>
+            <p className='mb-4 text-muted-foreground'>
+              Check your email for your referral code and next steps.
+            </p>
+            <p className='font-semibold text-[#2db56b] text-sm'>
+              Your referral code: {sessionStorage.getItem("referralCode")}
+            </p>
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            Redirecting to success page...
+          </p>
+        </div>
+      );
+    }
+
     return (
-      <form
-        action={`https://app.proforms.top/f/${process.env.NEXT_PUBLIC_PROFORMS_API_KEY}`}
-        method='POST'
-        onSubmit={handleBeforeSubmit}
-        className='mx-auto mb-4 max-w-md'
-      >
+      <form onSubmit={handleSubmit} className='mx-auto mb-4 max-w-md'>
         <div className='flex flex-col gap-3'>
           <Input
             type='text'
@@ -122,6 +175,7 @@ export default function WaitlistPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            disabled={isSubmitting}
             className='bg-background/80 backdrop-blur-sm focus:border-[#2db56b] border-border focus:ring-[#2db56b] h-12 text-base'
           />
           <Input
@@ -132,6 +186,7 @@ export default function WaitlistPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={isSubmitting}
             className='bg-background/80 backdrop-blur-sm focus:border-[#2db56b] border-border focus:ring-[#2db56b] h-12 text-base'
           />
 
@@ -147,7 +202,7 @@ export default function WaitlistPage() {
               placeholder='Referral code (optional)'
               value={referredBy}
               onChange={(e) => setReferredBy(e.target.value)}
-              disabled={hasReferralParam}
+              disabled={hasReferralParam || isSubmitting}
               className={`h-12 text-base bg-background/80 backdrop-blur-sm border-border focus:border-[#2db56b] focus:ring-[#2db56b] ${
                 hasReferralParam ? "opacity-70 cursor-not-allowed" : ""
               }`}
@@ -160,6 +215,7 @@ export default function WaitlistPage() {
                 <Button
                   type='button'
                   onClick={clearReferralParams}
+                  disabled={isSubmitting}
                   className='bg-[#2db56b] hover:bg-[#25a05d] shadow-[#2db56b]/20 shadow-lg px-3 h-8 font-semibold text-white transition-all'
                 >
                   X
@@ -168,19 +224,19 @@ export default function WaitlistPage() {
             )}
           </div>
 
-          <input
-            type='hidden'
-            name='referral_code'
-            value={generateReferralCode(email)}
-          />
-          <input type='hidden' name='referred_by' value={referredBy} />
-
           <Button
             type='submit'
             disabled={isSubmitting}
             className='bg-[#2db56b] hover:bg-[#25a05d] shadow-[#2db56b]/20 shadow-lg px-8 h-12 font-semibold text-white transition-all'
           >
-            {isSubmitting ? "Checking..." : "Join Waitlist"}
+            {isSubmitting ? (
+              <span className='flex items-center gap-2'>
+                <span className='border-white border-b-2 rounded-full w-4 h-4 animate-spin'></span>
+                Checking...
+              </span>
+            ) : (
+              "Join Waitlist"
+            )}
           </Button>
         </div>
 
@@ -197,7 +253,7 @@ export default function WaitlistPage() {
         className='w-full'
         style={{
           backgroundImage: "url('/girl.png')",
-          backgroundSize: "contain", // or "auto" if you don't want it cropped
+          backgroundSize: "contain",
           backgroundPosition: "-120px bottom",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
@@ -210,7 +266,7 @@ export default function WaitlistPage() {
               <Image
                 src='/MubaXpress.png'
                 alt='MubaXpress Logo'
-                width={80} // adjust to your logo’s size
+                width={80}
                 height={80}
                 className='object-contain -rotate-12'
                 priority
@@ -250,7 +306,7 @@ export default function WaitlistPage() {
               {Array.from({ length: 4 }).map((_, i) => {
                 const randomLetter = String.fromCharCode(
                   65 + Math.floor(Math.random() * 26)
-                ); // A–Z
+                );
                 return (
                   <div
                     key={i}
