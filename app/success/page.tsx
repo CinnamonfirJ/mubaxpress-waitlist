@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle2,
   Instagram,
-  Twitter,
+  // Twitter,
   MessageCircle,
   Copy,
   Check,
@@ -162,7 +162,7 @@ export default function SuccessPage() {
               className='bg-[#2db56b] hover:bg-[#25a05d] shadow-[#2db56b]/20 shadow-lg font-semibold text-white'
             >
               <a
-                href='https://wa.me/your-whatsapp-number'
+                href='https://chat.whatsapp.com/GnyHlJtMYZnJ3vaHjDA0YY?mode=wwt'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center gap-2'
@@ -177,7 +177,7 @@ export default function SuccessPage() {
               className='bg-transparent hover:bg-accent border-border'
             >
               <a
-                href='https://instagram.com/mubxpress'
+                href='https://www.instagram.com/mubaxpress?utm_source=qr&igsh=MTkzZDRiMWtnc3RtdA=='
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center gap-2'
@@ -186,7 +186,7 @@ export default function SuccessPage() {
                 Follow on Instagram
               </a>
             </Button>
-            <Button
+            {/* <Button
               asChild
               variant='outline'
               className='bg-transparent hover:bg-accent border-border'
@@ -200,7 +200,7 @@ export default function SuccessPage() {
                 <Twitter className='w-5 h-5' />
                 Follow on Twitter
               </a>
-            </Button>
+            </Button> */}
           </div>
           <p className='mt-4 text-muted-foreground text-sm'>
             Get insider updates, campus marketplace tips, and connect with other
