@@ -52,8 +52,8 @@ export default function WaitlistPage() {
     // ✅ Prevent duplicate emails using the same API used for leaderboard
     const checkDuplicateEmail = async (email: string): Promise<boolean> => {
       try {
-        const apiKey = process.env.NEXT_PUBLIC_PROFORMS_API_KEY;
-        const token = process.env.NEXT_PUBLIC_PROFORMS_TOKEN;
+        const apiKey = process.env.NEXT_PRIVATE_PROFORMS_API_KEY;
+        const token = process.env.NEXT_PRIVATE_PROFORMS_TOKEN;
         const url = `https://API.proforms.top/v1/access_form.php?api_key=${apiKey}&access_token=${token}`;
 
         const response = await fetch(url);
@@ -108,7 +108,7 @@ export default function WaitlistPage() {
 
     return (
       <form
-        action={`https://app.proforms.top/f/${process.env.NEXT_PUBLIC_PROFORMS_API_KEY}`}
+        action={`https://app.proforms.top/f/${process.env.NEXT_PRIVATE_PROFORMS_API_KEY}`}
         method='POST'
         onSubmit={handleBeforeSubmit}
         className='mx-auto mb-4 max-w-md'

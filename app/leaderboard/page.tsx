@@ -50,8 +50,8 @@ export default function LeaderboardPage() {
     setError("");
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_PROFORMS_API_KEY;
-      const token = process.env.NEXT_PUBLIC_PROFORMS_TOKEN;
+      const apiKey = process.env.NEXT_PRIVATE_PROFORMS_API_KEY;
+      const token = process.env.NEXT_PRIVATE_PROFORMS_TOKEN;
       const url = `https://API.proforms.top/v1/access_form.php?api_key=${apiKey}&access_token=${token}`;
 
       const response = await fetch(url);
