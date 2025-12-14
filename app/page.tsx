@@ -382,7 +382,7 @@ export default function WaitlistPage() {
           </div>
 
           {/* Social Proof */}
-          <div className='flex justify-center items-center gap-2 mb-8'>
+          <div className='flex justify-center items-center gap-2 bg-white mb-8 p-2 rounded-2xl'>
             <div className='flex -space-x-2'>
               {Array.from({ length: 4 }).map((_, i) => {
                 const randomLetter = String.fromCharCode(
