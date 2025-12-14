@@ -20,8 +20,8 @@ export default function TermsAndConditionsPage() {
             <p>
               The MubaXpress Referral Contest is open to Nigerian residents aged
               16 or older. Participants must use a valid email address to join
-              the waitlist. No account is required. Employees, contractors, or
-              affiliates of MubaXpress are not eligible to participate.
+              the waitlist. Employees, contractors, or affiliates of MubaXpress
+              are not eligible to participate.
             </p>
           </section>
 
@@ -42,9 +42,9 @@ export default function TermsAndConditionsPage() {
               3. Contest Duration
             </h2>
             <p>
-              The contest runs from <strong>[start date]</strong> to{" "}
-              <strong>[end date]</strong>. Referrals made before or after this
-              period will not be counted.
+              The contest runs from <strong>15th December,2025</strong> to
+              <strong>25th December, 2025</strong>. Referrals made before or
+              after this period will not be counted.
             </p>
           </section>
 
@@ -67,6 +67,12 @@ export default function TermsAndConditionsPage() {
                 <strong>3rd Place:</strong> ₦2,000
               </li>
             </ul>
+            <p className='mt-2'>
+              Prize eligibility is subject to minimum referral requirements: 1st
+              place requires at least 20 verified referrals, 2nd place requires
+              at least 15, and 3rd place requires at least 10.
+            </p>
+
             <p className='mt-2'>
               In case of a tie, ranking will be determined by the earliest
               verified referral timestamp. Prizes are non-transferable and
@@ -91,7 +97,7 @@ export default function TermsAndConditionsPage() {
               6. Winner Announcement
             </h2>
             <p>
-              Winners will be announced on <strong>[announcement date]</strong>{" "}
+              Winners will be announced on <strong>25th December, 2025</strong>{" "}
               via
               <strong> MubaXpress social media and email</strong>. Winners must
               respond within
