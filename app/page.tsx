@@ -6,9 +6,10 @@ import { Suspense, useEffect, useState } from "react";
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Trophy } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 function generateReferralCode(email: string): string {
   const timestamp = Date.now().toString(36);
@@ -298,6 +299,32 @@ export default function WaitlistPage() {
               Buy, sell, and trade within your local campus community. Safe,
               simple, and built exclusively for students.
             </p>
+          </div>
+
+          {/* Leaderboard CTA Banner */}
+          <div className='mb-8'>
+            <Link href='/leaderboard'>
+              <div className='group bg-gradient-to-r from-[#2db56b]/20 hover:from-[#2db56b]/30 via-[#25a05d]/20 hover:via-[#25a05d]/30 to-[#2db56b]/20 hover:to-[#2db56b]/30 backdrop-blur-sm p-6 border-[#2db56b]/40 border-2 hover:border-[#2db56b]/60 rounded-xl transition-all duration-300 cursor-pointer'>
+                <div className='flex sm:flex-row flex-col justify-between items-center gap-4'>
+                  <div className='flex items-center gap-4'>
+                    <div className='flex flex-shrink-0 justify-center items-center bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg group-hover:shadow-xl rounded-full w-10 md:w-14 h-10 md:h-14 transition-shadow'>
+                      <Trophy className='w-6 md:w-8 h-6 md:h-8 text-white' />
+                    </div>
+                    <div className='sm:text-left text-center'>
+                      <h3 className='mb-1 font-bold text-foreground text-lg md:text-xl'>
+                        🏆 View Referral Leaderboard
+                      </h3>
+                      <p className='text-muted-foreground text-sm'>
+                        See who&apos;s leading the race and claim your spot!
+                      </p>
+                    </div>
+                  </div>
+                  <Button className='bg-[#2db56b] hover:bg-[#25a05d] shadow-lg group-hover:shadow-xl px-6 h-11 font-semibold text-white whitespace-nowrap transition-all'>
+                    Check Rankings →
+                  </Button>
+                </div>
+              </div>
+            </Link>
           </div>
 
           {/* Social Proof */}
